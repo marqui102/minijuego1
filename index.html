@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minijuego: Atrapa el Círculo</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f0f0f0;
+      overflow: hidden;
+      position: relative;
+    }
+    #game-area {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      background-color: #222;
+      overflow: hidden;
+    }
+    .circle {
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      background-color: red;
+      border-radius: 50%;
+      cursor: pointer;
+      animation: fadeIn 0.2s ease-out;
+    }
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+    #score {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      color: white;
+      font-size: 20px;
+    }
+    #timer {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      color: white;
+      font-size: 20px;
+    }
+    #end-message {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 50px;
+      color: red;
+      text-align: center;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="game-area">
+    <div id="score">Puntaje: 0</div>
+    <div id="timer">Tiempo: 60</div>
+    <div id="end-message">¡HAS PERDIDO LA MERCANCÍA!</div>
+  </div>
+
+  <script>
+    const gameArea = document.getElementById('game-area');
+    const scoreDisplay = document.getElementById('score');
+    const timerDisplay = document.getElementById('timer');
+    const endMessage = document.getElementById('end-message');
+
+    let score = 0;
+    let timeLeft = 60;  // 1 minuto
+    let gameInterval;
+    let timerInterval;
+
+    // Función para generar un círculo en posición aleatoria
+    function createCircle() {
+      const circle = document.createElement('div');
+      circle.classList.add('circle');
+
+      const x = Math.random() * (gameArea.clientWidth - 50);
+      const y = Math.random() * (gameArea.clientHeight - 50);
+
+      circle.style.left = `${x}px`;
+      circle.style.top = `${y}px`;
+
+      // Aumenta el puntaje al hacer clic y elimina el círculo
+      circle.addEventListener('click', () => {
+        score++;
+        scoreDisplay.textContent = `Puntaje: ${score}`;
+        circle.remove();
+      });
+
+      gameArea.appendChild(circle);
+
+      // Elimina el círculo después de 2 segundos si no lo tocan
+      setTimeout(() => {
+        if (circle.parentNode) {
+          // Resta un punto si no se hizo clic en el círculo antes de que desaparezca
+          score--;
+          scoreDisplay.textContent = `Puntaje: ${score}`;
+          circle.remove();
+        }
+      }, 2000);
+    }
+
+    // Función para iniciar el juego
+    function startGame() {
+      gameInterval = setInterval(createCircle, 800); // Círculo cada 800ms
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        timerDisplay.textContent = `Tiempo: ${timeLeft}`;
+        if (timeLeft <= 0) {
+          endGame();
+        }
+      }, 1000);
+    }
+
+    // Función para finalizar el juego
+    function endGame() {
+      clearInterval(gameInterval);
+      clearInterval(timerInterval);
+      if (score >= 60) {
+        alert(`¡Felicidades! Has ganado con ${score} puntos.`);
+      } else {
+        // Mostrar el mensaje de "Has perdido la mercancía"
+        endMessage.style.display = 'block';
+        setTimeout(() => {
+          alert(`¡Juego terminado! Tu puntaje final es: ${score}. Necesitas al menos 60 puntos para ganar.`);
+          window.location.reload(); // Reinicia el juego
+        }, 2000); // Espera 2 segundos antes de reiniciar el juego
+      }
+    }
+
+    // Inicia el juego cuando carga la página
+    window.onload = startGame;
+  </script>
+</body>
+</html>
