@@ -23,6 +23,7 @@
       height: 100%;
       background-color: #222;
       overflow: hidden;
+      display: none;
     }
     .circle {
       position: absolute;
@@ -65,9 +66,38 @@
       text-align: center;
       display: none;
     }
+    #start-screen {
+      text-align: center;
+    }
+    #title {
+      font-size: 36px;
+      margin-bottom: 20px;
+    }
+    #instructions {
+      font-size: 20px;
+      margin-bottom: 30px;
+    }
+    #start-button {
+      padding: 10px 20px;
+      font-size: 20px;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #start-button:hover {
+      background-color: #0056b3;
+    }
   </style>
 </head>
 <body>
+  <div id="start-screen">
+    <div id="title">¡Atrapa el Círculo!</div>
+    <div id="instructions">Consigue 60 puntos en 1 minuto para ganar la mercancía.</div>
+    <button id="start-button">Empezar</button>
+  </div>
+
   <div id="game-area">
     <div id="score">Puntaje: 0</div>
     <div id="timer">Tiempo: 60</div>
@@ -75,13 +105,15 @@
   </div>
 
   <script>
+    const startScreen = document.getElementById('start-screen');
+    const startButton = document.getElementById('start-button');
     const gameArea = document.getElementById('game-area');
     const scoreDisplay = document.getElementById('score');
     const timerDisplay = document.getElementById('timer');
     const endMessage = document.getElementById('end-message');
 
     let score = 0;
-    let timeLeft = 60;  // 1 minuto
+    let timeLeft = 60;
     let gameInterval;
     let timerInterval;
 
@@ -118,6 +150,17 @@
 
     // Función para iniciar el juego
     function startGame() {
+      // Oculta la pantalla inicial y muestra el área de juego
+      startScreen.style.display = 'none';
+      gameArea.style.display = 'block';
+
+      // Reinicia puntaje y tiempo
+      score = 0;
+      timeLeft = 60;
+      scoreDisplay.textContent = `Puntaje: ${score}`;
+      timerDisplay.textContent = `Tiempo: ${timeLeft}`;
+
+      // Inicia los intervalos del juego
       gameInterval = setInterval(createCircle, 800); // Círculo cada 800ms
       timerInterval = setInterval(() => {
         timeLeft--;
@@ -144,8 +187,8 @@
       }
     }
 
-    // Inicia el juego cuando carga la página
-    window.onload = startGame;
+    // Inicia el juego al hacer clic en el botón "Empezar"
+    startButton.addEventListener('click', startGame);
   </script>
 </body>
 </html>
