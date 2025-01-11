@@ -96,9 +96,9 @@
   <div id="start-screen">
     <div id="title">¡Atrapa el Círculo!</div>
     <div id="instructions">Consigue 60 puntos en 1 minuto para ganar la mercancía.</div>
-    <button class="difficulty-button" data-speed="1500">Fácil</button>
-    <button class="difficulty-button" data-speed="800">Medio</button>
-    <button class="difficulty-button" data-speed="500">Difícil</button>
+    <button class="difficulty-button" data-speed="1000" data-penalty="true">Fácil</button>
+    <button class="difficulty-button" data-speed="800" data-penalty="true">Medio</button>
+    <button class="difficulty-button" data-speed="500" data-penalty="false">Difícil</button>
   </div>
 
   <div id="game-area">
@@ -120,6 +120,7 @@
     let gameInterval;
     let timerInterval;
     let circleSpeed = 800; // Velocidad predeterminada: nivel Medio
+    let penaltyEnabled = true; // Si se activa o no la penalización
 
     // Función para generar un círculo en posición aleatoria
     function createCircle() {
@@ -144,19 +145,25 @@
       // Elimina el círculo después de 2 segundos si no lo tocan
       setTimeout(() => {
         if (circle.parentNode) {
-          // Resta un punto si no se hizo clic en el círculo antes de que desaparezca
-          score--;
-          scoreDisplay.textContent = `Puntaje: ${score}`;
+          if (penaltyEnabled) {
+            // Resta un punto solo si la penalización está habilitada
+            score--;
+            scoreDisplay.textContent = `Puntaje: ${score}`;
+          }
           circle.remove();
         }
       }, 2000);
     }
 
     // Función para iniciar el juego
-    function startGame(speed) {
+    function startGame(speed, penalty) {
       // Oculta la pantalla inicial y muestra el área de juego
       startScreen.style.display = 'none';
       gameArea.style.display = 'block';
+
+      // Configura la velocidad y la penalización
+      circleSpeed = speed;
+      penaltyEnabled = penalty;
 
       // Reinicia puntaje y tiempo
       score = 0;
@@ -165,7 +172,7 @@
       timerDisplay.textContent = `Tiempo: ${timeLeft}`;
 
       // Inicia los intervalos del juego
-      gameInterval = setInterval(createCircle, speed); // La velocidad depende de la dificultad seleccionada
+      gameInterval = setInterval(createCircle, circleSpeed); // La velocidad depende de la dificultad seleccionada
       timerInterval = setInterval(() => {
         timeLeft--;
         timerDisplay.textContent = `Tiempo: ${timeLeft}`;
@@ -195,7 +202,8 @@
     difficultyButtons.forEach((button) => {
       button.addEventListener('click', (event) => {
         const speed = parseInt(event.target.getAttribute('data-speed'));
-        startGame(speed);
+        const penalty = event.target.getAttribute('data-penalty') === 'true';
+        startGame(speed, penalty);
       });
     });
   </script>
